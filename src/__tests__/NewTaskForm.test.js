@@ -29,21 +29,27 @@ test("calls the onTaskFormSubmit callback prop when the form is submitted", () =
 });
 
 test("adds a new item to the list when the form is submitted", () => {
+  const onTaskFormSubmit = jest.fn();
   render(<App />);
 
-  const codeCount = screen.queryAllByText(/Code/).length;
+  const initialTaskCount = screen.getAllByRole('listitem').length;
 
-  fireEvent.change(screen.queryByLabelText(/Details/), {
+  fireEvent.change(screen.getByLabelText(/Details/), {
     target: { value: "Pass the tests" },
   });
 
-  fireEvent.change(screen.queryByLabelText(/Category/), {
+  fireEvent.change(screen.getByLabelText(/Category/), {
     target: { value: "Code" },
   });
 
-  fireEvent.submit(screen.queryByText(/Add task/));
+  fireEvent.submit(screen.getByText(/Add task/));
 
-  expect(screen.queryByText(/Pass the tests/)).toBeInTheDocument();
+  const updatedTaskCount = screen.getAllByRole('listitem').length;
 
-  expect(screen.queryAllByText(/Code/).length).toBe(codeCount + 1);
+  expect(onTaskFormSubmit).toHaveBeenCalledWith({
+    text: "Pass the tests",
+    category: "Code",
+  });
+
+  expect(updatedTaskCount).toBe(initialTaskCount + 1);
 });
